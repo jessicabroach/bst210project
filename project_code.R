@@ -75,6 +75,11 @@ hist(df$agegroup5)
 #nspd
 boxplot(df$nspd ~ df$currentasthma12)
 hist(df$nspd)
+#employment
+boxplot(df$employment12 ~ df$currentasthma12)
+hist(df$employment12)
+boxplot(df$emp3 ~ df$currentasthma12)
+hist(df$emp3)
 
 #summary
 summary(df)
@@ -84,50 +89,50 @@ table1(~ factor(sex) + factor(agegroup5) + factor(newrace) | currentasthma12, da
 
 ##regression models
 #full model
-full_model <- glm(currentasthma12 ~ anymice + anyroach + anymold + shshome12 + 
+full_model <- glm(as.factor(currentasthma12) ~ anymice + anyroach + anymold + shshome12 + 
                     as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-                    sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+                    sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(full_model)
 #reduced model
-reduced_model <- glm(currentasthma12 ~ anymice + anyroach + anymold + shshome12 + 
-                       as.factor(weightall) + sex + as.factor(agegroup5) + nspd, 
+reduced_model <- glm(as.factor(currentasthma12) ~ anymice + anyroach + anymold + shshome12 + 
+                       as.factor(weightall) + sex + as.factor(agegroup5) + nspd + as.factor(employment12), 
                      data = df, family = binomial())
 summary(reduced_model)
 #full model with interaction terms for the exposures
-full_model2 <- glm(currentasthma12 ~ anymice + anyroach + anymold + shshome12 + 
+full_model2 <- glm(as.factor(currentasthma12) ~ anymice + anyroach + anymold + shshome12 + 
                     as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-                    sex + as.factor(agegroup5) + nspd + anymice*anyroach + anymice*anymold + 
+                    sex + as.factor(agegroup5) + nspd + as.factor(employment12) + anymice*anyroach + anymice*anymold + 
                     anymice*shshome12 + anyroach*anymold + anyroach*shshome12 + 
                     anymold*shshome12, data = df, family = binomial())
 summary(full_model2)
 #separate model for each exposure
-mice <- glm(currentasthma12 ~ anymice +  
+mice <- glm(as.factor(currentasthma12) ~ anymice +  
                      as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
                      as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-                     sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+                     sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(mice)
-roach <- glm(currentasthma12 ~ anyroach +  
+roach <- glm(as.factor(currentasthma12) ~ anyroach +  
               as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(roach)
-mold <- glm(currentasthma12 ~ anymold +  
+mold <- glm(as.factor(currentasthma12) ~ anymold +  
               as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(mold)
-shs <- glm(currentasthma12 ~ shshome12 +  
+shs <- glm(as.factor(currentasthma12) ~ shshome12 +  
               as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(shs)
 
 ##covariate selection procedures
 glm1 <- glm(as.factor(currentasthma12) ~ as.factor(weightall) + as.factor(neighpovgroup4_0711) + 
               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(agegroup5) + nspd + as.factor(employment12), data = df, family = binomial())
 #forward selection
 stepModel1 <- step(glm1, direction = c("forward"), trace = 0)
 summary(stepModel1)
@@ -136,22 +141,41 @@ stepModel2 <- step(glm1, direction = c("backward"), trace = 0)
 summary(stepModel2)
 #stepwise
 stepModel3 <- step(glm1, direction = c("both"), trace = 0)
-summary(stepModel3)
+summary(stepModel3) #stepwise indicated that weightall, sex, education, nspd,
+#and employment12 are best predictors
 
 ##models for exposure based on selection procedures
 mice2 <- glm(as.factor(currentasthma12) ~ anymice +  
               as.factor(weightall) + 
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(education) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(mice2)
 roach2 <- glm(as.factor(currentasthma12) ~ anyroach +  
                 as.factor(weightall) + 
-                sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+                sex + as.factor(education) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(roach2)
 mold2 <- glm(as.factor(currentasthma12) ~ anymold +  
                as.factor(weightall) + 
-               sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+               sex + as.factor(education) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(mold2)
 shs2 <- glm(as.factor(currentasthma12) ~ shshome12 +  
               as.factor(weightall) + 
-              sex + as.factor(agegroup5) + nspd, data = df, family = binomial())
+              sex + as.factor(education) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(shs2)
+#crude models
+mice3 <- glm(as.factor(currentasthma12) ~ anymice, data = df, family = binomial())
+summary(mice3)
+roach3 <- glm(as.factor(currentasthma12) ~ anyroach, data = df, family = binomial())
+summary(roach3)
+mold3 <- glm(as.factor(currentasthma12) ~ anymold, data = df, family = binomial())
+summary(mold3)
+shs3 <- glm(as.factor(currentasthma12) ~ shshome12, data = df, family = binomial())
+summary(shs3)
+
+##model evaluation
+
+
+
+
+
+
+
