@@ -16,8 +16,8 @@ chs <- read_sas("chs2012_public.sas7bdat.html")
 myvars <- c("currentasthma12", "everasthma", "anymold", "anymice", "seenmice30days",
             "anyroach", "seenroach30days", "shshome12", "shsmokerinhome", 
             "agegroup5", "sex", "newrace", "environ3", "environ2", "environ1",
-            "povertygroup", "weightall", "smoker", "smokecat", "nspd", 
-            "education", "employment12", "emp3", "neighpovgroup4_0711")
+            "weightall", "smoker", "smokecat", "nspd", 
+            "education", "emp3")
 df <- chs[myvars]
 
 #exclude observation with missing outcome
@@ -162,7 +162,7 @@ shs2 <- glm(as.factor(currentasthma12) ~ shshome12 +
               sex + as.factor(education) + nspd + as.factor(employment12), data = df, family = binomial())
 summary(shs2)
 #crude models
-mice3 <- glm(as.factor(currentasthma12) ~ anymice, data = df, family = binomial())
+mice3 <- glm(as.factor(currentasthma12) ~ environ2, data = df, family = binomial())
 summary(mice3)
 roach3 <- glm(as.factor(currentasthma12) ~ anyroach, data = df, family = binomial())
 summary(roach3)
@@ -172,6 +172,7 @@ shs3 <- glm(as.factor(currentasthma12) ~ shshome12, data = df, family = binomial
 summary(shs3)
 
 ##model evaluation
+
 
 
 
