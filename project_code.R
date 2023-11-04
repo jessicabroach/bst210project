@@ -36,7 +36,7 @@ df$female <- df$sex-1
 df$currentasthma12 <- ifelse(df$currentasthma12 == 2, 0, 1)
 df$nspd <- ifelse(df$nspd == 2, 0, 1)
 df$shshome12 <- ifelse(df$shshome12 == 2, 0, 1)
-df$anymold <- ifelse(df$mold == 2, 0, 1)
+df$anymold <- ifelse(df$anymold == 2, 0, 1)
 
 ##data exploration
 #outcome
@@ -100,7 +100,7 @@ table1(~ factor(sex) + factor(agegroup5) + factor(newrace) | currentasthma12, da
 #crude exposure models
 mice <- glm(currentasthma12 ~ environ2, data = df, family = binomial())
 summary(mice)
-roach <- glm(currentasthma12 ~ seenroach30days, data = df, family = binomial())
+roach <- glm(currentasthma12 ~ environ1, data = df, family = binomial())
 summary(roach)
 mold <- glm(currentasthma12 ~ anymold, data = df, family = binomial())
 summary(mold)
@@ -112,7 +112,7 @@ mice2 <- glm(currentasthma12 ~ environ2 + as.factor(weightall) +
                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
                     sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(mice2)
-roach2 <- glm(currentasthma12 ~ seenroach30days + as.factor(weightall) + 
+roach2 <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
                sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(roach2)
@@ -125,6 +125,60 @@ shs2 <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) +
                sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(shs2)
 
+#check for confounding
+#mice
+cmice <- glm(currentasthma12 ~ environ2 + as.factor(smokecat), data = df, family = binomial())
+summary(cmice)
+100 * ((0.023415 - 0.023936)/0.023936)
+cmice2 <- glm(currentasthma12 ~ environ2 + as.factor(newrace), data = df, family = binomial())
+summary(cmice2)
+100 * ((0.023415 - 0.022918)/0.022918)
+cmice3 <- glm(currentasthma12 ~ environ2 + as.factor(education), data = df, family = binomial())
+summary(cmice3)
+100 * ((0.023415 - 0.022312)/0.022312)
+cmice4 <- glm(currentasthma12 ~ environ2 + as.factor(agegroup5), data = df, family = binomial())
+summary(cmice4)
+100 * ((0.023415 - 0.021911)/0.021911)
+#roach
+croach <- glm(currentasthma12 ~ environ1 + as.factor(smokecat), data = df, family = binomial())
+summary(croach)
+100 * ((0.010878 - 0.011372)/0.011372)
+croach2 <- glm(currentasthma12 ~ environ1 + as.factor(newrace), data = df, family = binomial())
+summary(croach2)
+100 * ((0.010878 - 0.009642)/0.009642) #confounder
+croach3 <- glm(currentasthma12 ~ environ1 + as.factor(education), data = df, family = binomial())
+summary(croach3)
+100 * ((0.010878 - 0.009907)/0.009907)
+croach4 <- glm(currentasthma12 ~ environ1 + as.factor(agegroup5), data = df, family = binomial())
+summary(croach4)
+100 * ((0.010878 - 0.009834)/0.009834) #confounder
+#mold
+cmold <- glm(currentasthma12 ~ anymold + as.factor(smokecat), data = df, family = binomial())
+summary(cmold)
+100 * ((0.3617 - 0.3581)/0.3581)
+cmold2 <- glm(currentasthma12 ~ anymold + as.factor(newrace), data = df, family = binomial())
+summary(cmold2)
+100 * ((0.3617 - 0.3467)/0.3467)
+cmold3 <- glm(currentasthma12 ~ anymold + as.factor(education), data = df, family = binomial())
+summary(cmold3)
+100 * ((0.3617 - 0.34762)/0.34762)
+cmold4 <- glm(currentasthma12 ~ anymold + as.factor(agegroup5), data = df, family = binomial())
+summary(cmold4)
+100 * ((0.3617 - 0.3539)/0.3539)
+#second hand
+cshs <- glm(currentasthma12 ~ shshome12 + as.factor(smokecat), data = df, family = binomial())
+summary(cshs)
+100 * ((0.54003 - 0.4433)/0.4433) #confounder
+cshs2 <- glm(currentasthma12 ~ shshome12 + as.factor(newrace), data = df, family = binomial())
+summary(cshs2)
+100 * ((0.54003 - 0.51760)/0.51760)
+cshs3 <- glm(currentasthma12 ~ shshome12 + as.factor(education), data = df, family = binomial())
+summary(cshs3)
+100 * ((0.54003 - 0.53304)/0.53304)
+cshs4 <- glm(currentasthma12 ~ shshome12 + as.factor(agegroup5), data = df, family = binomial())
+summary(cshs4)
+100 * ((0.54003 - 0.5318)/0.5318)
+
 #check for em
 mice3 <- glm(currentasthma12 ~ environ2 + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
@@ -132,13 +186,13 @@ mice3 <- glm(currentasthma12 ~ environ2 + as.factor(weightall) +
                environ2*as.factor(emp3) + environ2*as.factor(agegroup5) + environ2*sex + environ2*as.factor(smokecat) + 
                environ2*as.factor(weightall), data = df, family = binomial())
 summary(mice3)
-roach3 <- glm(currentasthma12 ~ seenroach30days + as.factor(weightall) + 
+roach3 <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-               sex + as.factor(agegroup5) + nspd + as.factor(emp3) + seenroach30days*as.factor(newrace) +
-               seenroach30days*as.factor(emp3) + seenroach30days*as.factor(agegroup5) + seenroach30days*sex 
-              + seenroach30days*as.factor(smokecat) + 
-               seenroach30days*as.factor(weightall), data = df, family = binomial())
-summary(roach3) #sex is an effect modifer
+               sex + as.factor(agegroup5) + nspd + as.factor(emp3) + environ1*as.factor(newrace) +
+               environ1*as.factor(emp3) + environ1*as.factor(agegroup5) + environ1*sex 
+              + environ1*as.factor(smokecat) + 
+               environ1*as.factor(weightall), data = df, family = binomial())
+summary(roach3)
 mold3 <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
                sex + as.factor(agegroup5) + nspd + as.factor(emp3) + anymold*as.factor(newrace) +
@@ -172,7 +226,7 @@ mice4 <- glm(currentasthma12 ~ environ2 +
               as.factor(weightall) + 
               sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(mice4) #best model for mice
-roach4 <- glm(currentasthma12 ~ seenroach30days +  
+roach4 <- glm(currentasthma12 ~ environ1 +  
                 as.factor(weightall) + 
                 sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(roach4) #best model for roach
@@ -181,34 +235,52 @@ mold4 <- glm(currentasthma12 ~ anymold +
                sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(mold4) #best model for mold
 shs4 <- glm(currentasthma12 ~ shshome12 +  
-              as.factor(weightall) + 
+              as.factor(weightall) + as.factor(smokecat) +
               sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
 summary(shs4) #best model for shshome12
 
-##include interaction term for sex in roach mod
-roach5 <- glm(currentasthma12 ~ seenroach30days +  
-                as.factor(weightall) + 
-                sex + as.factor(agegroup5) + nspd + as.factor(emp3) + 
-                seenroach30days*sex, data = df, family = binomial())
-summary(roach5)
-
+##final models and evaluation##
+finalmice <- glm(currentasthma12 ~ environ2 +  
+                      as.factor(weightall) + 
+                      sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalmice)
+finalroach <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + as.factor(newrace) +
+                    sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalroach) 
+finalmold <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
+                             as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                             sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalmold)
+finalshs <- glm(currentasthma12 ~ shshome12 +  
+                  as.factor(weightall) + as.factor(smokecat) +
+                  sex + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalshs)
 ##assess multicolinearity
-VIF(mice4)
-VIF(roach5)
-VIF(mold4)
-VIF(shs4)
+VIF(finalmice)
+VIF(finalroach)
+VIF(finalmold)
+VIF(finalshs)
 
 ##model evaluation
 #calibration
-hoslem.test(mice4$y, fitted(mice4), g=12)
-hoslem.test(roach5$y, fitted(roach5), g=13)
-hoslem.test(mold4$y, fitted(mold4), g=12)
-hoslem.test(shs4$y, fitted(shs4), g=12)
+hoslem.test(finalmice$y, fitted(finalmice), g=12)
+hoslem.test(finalroach$y, fitted(finalroach), g=15)
+hoslem.test(finalmold$y, fitted(finalmold), g=22)
+hoslem.test(finalshs$y, fitted(finalshs), g=15)
 
-
-
-
-
+##odds ratios for final models
+#mice
+exp(coef(finalmice)[2])
+exp(coef(finalmice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalmice)[2,2])) 
+#roach
+exp(coef(finalroach)[2])
+exp(coef(finalroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finalroach)[2,2])) 
+#mold
+exp(coef(finalmold)[2])
+exp(coef(finalmold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalmold)[2,2])) 
+#shs
+exp(coef(finalshs)[2])
+exp(coef(finalshs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalshs)[2,2])) 
 
 
 
