@@ -286,75 +286,54 @@ exp(coef(finalmold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalmold)[2,2]))
 exp(coef(finalshs)[2])
 exp(coef(finalshs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalshs)[2,2])) 
 
-##sensitivity analysis using penalized models
-# Model select via Penalized regression methods
-set.seed(17)
-lambda_grid <- .2 ^ (-50:50)
+###final models
+#mice
+finalumice <- glm(currentasthma12 ~ environ2, data = df, family = binomial())
+summary(finalumice)
+exp(coef(finalumice)[2])
+exp(coef(finalumice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumice)[2,2])) 
+finalamice <- glm(currentasthma12 ~ environ2 + as.factor(weightall) + 
+               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+               female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalamice)
+exp(coef(finalamice)[2])
+exp(coef(finalamice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamice)[2,2])) 
+#roach
+finaluroach <- glm(currentasthma12 ~ environ1, data = df, family = binomial())
+summary(finaluroach)
+exp(coef(finaluroach)[2])
+exp(coef(finaluroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finaluroach)[2,2])) 
+finalaroach <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
+                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalaroach)
+exp(coef(finalaroach)[2])
+exp(coef(finalaroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finalaroach)[2,2])) 
+#mold
+finalumold <- glm(currentasthma12 ~ anymold, data = df, family = binomial())
+summary(finalumold)
+exp(coef(finalumold)[2])
+exp(coef(finalumold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumold)[2,2])) 
+finalamold <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
+               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+               female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalamold)
+exp(coef(finalamold)[2])
+exp(coef(finalamold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamold)[2,2])) 
+#shs
+finalushs <- glm(currentasthma12 ~ shshome12, data = df, family = binomial())
+summary(finalushs)
+exp(coef(finalushs)[2])
+exp(coef(finalushs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalushs)[2,2])) 
+finalashs <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) + 
+              as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+              female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+summary(finalashs)
+exp(coef(finalashs)[2])
+exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
 
-# Prepare X matrix (minus death) for input to glmnet
-sens <- df[,c("currentasthma12","agegroup5","newrace","weightall","smokecat","nspd",
-                    "education","emp3","female")]
-x <- model.matrix(currentasthma12~., data=sens)[,-c(1)]
-y <- sens$currentasthma12
-names(x)<- c("agegroup5","newrace","weightall","smokecat","nspd",
-                    "education","emp3","female")
-
-# Ridge
-ridge = glmnet(x,y, alpha=0,family="binomial",
-                    lambda=lambda_grid, data=sens)
-#print(ridge.fram)
-vip(ridge, num_features=8, geom="point", include_type=TRUE)
-par(mfrow=c(1,2))
-plot(ridge)
-cv.ridge <- cv.glmnet(x,y, alpha=0, family="binomial", data=sens)
-plot(cv.ridge)
-lambda_min <- cv.ridge$lambda.min
-lambda_1se <- cv.ridge$lambda.1se
-coef(cv.ridge,s=lambda_1se)
-
-# LASSO
-lasso = glmnet(x,y, alpha=1,family="binomial",
-                    lambda=lambda_grid, data=sens)
-vip(lasso, num_features=12, geom="point", include_type=TRUE)
-par(mfrow=c(1,2))
-plot(lasso)
-cv.lasso <- cv.glmnet(x,y, alpha=1, family="binomial")
-plot(cv.lasso)
-lambda_min <- cv.lasso$lambda.min
-lambda_1se <- cv.lasso$lambda.1se
-coef(cv.lasso,s=lambda_1se)
-
-# Elastic Net
-EN = glmnet(x,y, alpha=0.5, family="binomial",
-                 lambda=lambda_grid, data=sens)
-vip(EN, num_features=12, geom="point", include_type=TRUE)
-par(mfrow=c(1,2))
-plot(EN)
-cv.EN <- cv.glmnet(x,y, alpha=0.5, family="binomial")
-plot(cv.EN)
-lambda_min <- cv.EN$lambda.min
-lambda_1se <- cv.EN$lambda.1se
-coef(cv.EN,s=lambda_1se)
-
-# all plot together
-par(mfrow=c(1,3))
-
-plot(ridge)
-plot(lasso)
-plot(EN)
-
-plot(cv.ridge)
-plot(cv.lasso)
-plot(cv.EN)
-
-out <- cbind(coef(cv.ridge,s=lambda_1se),coef(cv.lasso,s=lambda_1se),
-             coef(cv.EN,s=lambda_1se))
-colnames(out) <- c("Ridge", "LASSO", "EN")
-out
-
-
-
-
-
+#demographic characteristics
+table1(~ factor(female) + factor(agegroup5) + factor(education) + factor(newrace) + 
+         factor(smokecat) + factor(weightall) + factor(emp3) | currentasthma12, data = df)
 
 
