@@ -294,7 +294,7 @@ exp(coef(finalumice)[2])
 exp(coef(finalumice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumice)[2,2])) 
 finalamice <- glm(currentasthma12 ~ environ2 + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-               female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+               female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(finalamice)
 exp(coef(finalamice)[2])
 exp(coef(finalamice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamice)[2,2])) 
@@ -305,7 +305,7 @@ exp(coef(finaluroach)[2])
 exp(coef(finaluroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finaluroach)[2,2])) 
 finalaroach <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
                 as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-                female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+                female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(finalaroach)
 exp(coef(finalaroach)[2])
 exp(coef(finalaroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finalaroach)[2,2])) 
@@ -316,7 +316,7 @@ exp(coef(finalumold)[2])
 exp(coef(finalumold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumold)[2,2])) 
 finalamold <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
                as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-               female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+               female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(finalamold)
 exp(coef(finalamold)[2])
 exp(coef(finalamold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamold)[2,2])) 
@@ -327,7 +327,7 @@ exp(coef(finalushs)[2])
 exp(coef(finalushs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalushs)[2,2])) 
 finalashs <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) + 
               as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
-              female + as.factor(agegroup5) + nspd + as.factor(emp3), data = df, family = binomial())
+              female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(finalashs)
 exp(coef(finalashs)[2])
 exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
@@ -336,4 +336,27 @@ exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2]))
 table1(~ factor(female) + factor(agegroup5) + factor(education) + factor(newrace) + 
          factor(smokecat) + factor(weightall) + factor(emp3) | currentasthma12, data = df)
 
+#sensitivity analysis
+#mice
+sen1 <- glm(currentasthma12 ~ as.factor(seenmice30days), data = df, family = binomial())
+summary(sen1)
+exp(coef(sen1)[2])
+exp(coef(sen1)[2] + c(-1, 1)*1.96*sqrt(vcov(sen1)[2,2])) 
+sen1_2 <- glm(currentasthma12 ~ as.factor(seenmice30days) + as.factor(weightall) + 
+                    as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                    female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
+summary(sen1_2)
+exp(coef(sen1_2)[2])
+exp(coef(sen1_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen1_2)[2,2])) 
+#roach
+sen2 <- glm(currentasthma12 ~ as.factor(seenroach30days), data = df, family = binomial())
+summary(sen2)
+exp(coef(sen2)[2])
+exp(coef(sen2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2)[2,2])) 
+sen2_2 <- glm(currentasthma12 ~ as.factor(seenroach30days) + as.factor(weightall) + 
+                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                     female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
+summary(sen2_2)
+exp(coef(sen2_2)[2])
+exp(coef(sen2_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2_2)[2,2])) 
 
