@@ -336,7 +336,9 @@ exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2]))
 table1(~ factor(female) + factor(agegroup5) + factor(education) + factor(newrace) + 
          factor(smokecat) + factor(weightall) + factor(emp3) | currentasthma12, data = df)
 
-#sensitivity analysis
+###sensitivity analysis
+
+##categorical variables
 #mice
 sen1 <- glm(currentasthma12 ~ as.factor(seenmice30days), data = df, family = binomial())
 summary(sen1)
@@ -360,7 +362,8 @@ summary(sen2_2)
 exp(coef(sen2_2)[2])
 exp(coef(sen2_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2_2)[2,2])) 
 
-
+##simple imputation
+x <- sample(c(1, 2, 3), size = 20, replace = TRUE, prob = c(0.305, 0.324, 0.370))
 
 ##secondary analysis
 
@@ -429,4 +432,6 @@ finalashs <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) +
 summary(finalashs)
 exp(coef(finalashs)[2])
 exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
+
+###sensitivity analysis
 
