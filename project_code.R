@@ -360,3 +360,73 @@ summary(sen2_2)
 exp(coef(sen2_2)[2])
 exp(coef(sen2_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2_2)[2,2])) 
 
+
+
+##secondary analysis
+
+#subsetting only needed variables
+myvars2 <- c("currentasthma12", "anymold", "anymice", "seenmice30days",
+            "anyroach", "seenroach30days", "shshome12", "shsmokerinhome", 
+            "agegroup5", "sex", "newrace", "environ3", "environ2", "environ1",
+            "weightall", "smoker", "smokecat", "nspd", 
+            "education", "emp3")
+df2 <- chs[myvars2]
+
+#exclude observation with missing outcome
+df2 <- df2 %>% drop_na(currentasthma12)
+
+#handling missing data
+df2 <- na.omit(df2)
+
+#recode binary variables
+df2$female <- df2$sex-1
+df2$currentasthma12 <- ifelse(df2$currentasthma12 == 2, 0, 1)
+df2$shshome12 <- ifelse(df2$shshome12 == 2, 0, 1)
+df2$anymold <- ifelse(df2$anymold == 2, 0, 1)
+
+###final models
+#mice
+finalumice <- glm(currentasthma12 ~ environ2, data = df2, family = binomial())
+summary(finalumice)
+exp(coef(finalumice)[2])
+exp(coef(finalumice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumice)[2,2])) 
+finalamice <- glm(currentasthma12 ~ environ2 + as.factor(weightall) + 
+                    as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                    female + as.factor(agegroup5) + as.factor(emp3), data = df2, family = binomial())
+summary(finalamice)
+exp(coef(finalamice)[2])
+exp(coef(finalamice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamice)[2,2])) 
+#roach
+finaluroach <- glm(currentasthma12 ~ environ1, data = df2, family = binomial())
+summary(finaluroach)
+exp(coef(finaluroach)[2])
+exp(coef(finaluroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finaluroach)[2,2])) 
+finalaroach <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
+                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                     female + as.factor(agegroup5) + as.factor(emp3), data = df2, family = binomial())
+summary(finalaroach)
+exp(coef(finalaroach)[2])
+exp(coef(finalaroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finalaroach)[2,2])) 
+#mold
+finalumold <- glm(currentasthma12 ~ anymold, data = df2, family = binomial())
+summary(finalumold)
+exp(coef(finalumold)[2])
+exp(coef(finalumold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalumold)[2,2])) 
+finalamold <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
+                    as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                    female + as.factor(agegroup5) + as.factor(emp3), data = df2, family = binomial())
+summary(finalamold)
+exp(coef(finalamold)[2])
+exp(coef(finalamold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamold)[2,2])) 
+#shs
+finalushs <- glm(currentasthma12 ~ shshome12, data = df2, family = binomial())
+summary(finalushs)
+exp(coef(finalushs)[2])
+exp(coef(finalushs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalushs)[2,2])) 
+finalashs <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) + 
+                   as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                   female + as.factor(agegroup5) + as.factor(emp3), data = df2, family = binomial())
+summary(finalashs)
+exp(coef(finalashs)[2])
+exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
+
