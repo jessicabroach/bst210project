@@ -342,28 +342,85 @@ table1(~ factor(female) + factor(agegroup5) + factor(education) + factor(newrace
 #mice
 sen1 <- glm(currentasthma12 ~ as.factor(seenmice30days), data = df, family = binomial())
 summary(sen1)
-exp(coef(sen1)[2])
-exp(coef(sen1)[2] + c(-1, 1)*1.96*sqrt(vcov(sen1)[2,2])) 
+exp(coef(sen1))
+exp(confint(sen1))
 sen1_2 <- glm(currentasthma12 ~ as.factor(seenmice30days) + as.factor(weightall) + 
                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
                     female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(sen1_2)
-exp(coef(sen1_2)[2])
-exp(coef(sen1_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen1_2)[2,2])) 
+exp(coef(sen1_2))
+exp(confint(sen1_2))
 #roach
 sen2 <- glm(currentasthma12 ~ as.factor(seenroach30days), data = df, family = binomial())
 summary(sen2)
-exp(coef(sen2)[2])
-exp(coef(sen2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2)[2,2])) 
+exp(coef(sen2))
+exp(confint(sen2))
 sen2_2 <- glm(currentasthma12 ~ as.factor(seenroach30days) + as.factor(weightall) + 
                      as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
                      female + as.factor(agegroup5) + as.factor(emp3), data = df, family = binomial())
 summary(sen2_2)
-exp(coef(sen2_2)[2])
-exp(coef(sen2_2)[2] + c(-1, 1)*1.96*sqrt(vcov(sen2_2)[2,2])) 
+exp(coef(sen2_2))
+exp(confint(sen2_2)) 
 
 ##simple imputation
-x <- sample(c(1, 2, 3), size = 20, replace = TRUE, prob = c(0.305, 0.324, 0.370))
+df3 <- chs[myvars]
+
+#exclude observation with missing outcome and exposure
+df3 <- df3 %>% drop_na(currentasthma12)
+df3 <- df3 %>% drop_na(environ2)
+df3 <- df3 %>% drop_na(environ1)
+df3 <- df3 %>% drop_na(anymold)
+df3 <- df3 %>% drop_na(shshome12)
+
+#restrict data to only those who ever had asthma
+df3 <- df3[df3$everasthma == 1, ]
+
+#recode binary variables
+df3$female <- df3$sex-1
+df3$currentasthma12 <- ifelse(df3$currentasthma12 == 2, 0, 1)
+df3$nspd <- ifelse(df3$nspd == 2, 0, 1)
+df3$shshome12 <- ifelse(df3$shshome12 == 2, 0, 1)
+df3$anymold <- ifelse(df3$anymold == 2, 0, 1)
+
+#create samples
+weight <- sample(c(1, 2, 3), size = 19, replace = TRUE, prob = c(0.302, 0.326, 0.372))
+smoke <- sample(c(1, 2, 3, 4), size = 9, replace = TRUE, prob = c(0.051, 0.077, 0.046, 0.826))
+education <- sample(c(1, 2, 3, 4), size = 5, replace = TRUE, prob = c(0.208, 0.202, 0.225, 0.365))
+
+#impute missing values with samples
+df3$weightall <- ifelse(is.na(df3$weightall), weight, df3$weightall)
+df3$smokecat <- ifelse(is.na(df3$smokecat), smoke, df3$smokecat)
+df3$education <- ifelse(is.na(df3$education), education, df3$education)
+
+#rerun models with imputed data
+#mice
+finalamice <- glm(currentasthma12 ~ environ2 + as.factor(weightall) + 
+                    as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                    female + as.factor(agegroup5) + as.factor(emp3), data = df3, family = binomial())
+summary(finalamice)
+exp(coef(finalamice)[2])
+exp(coef(finalamice)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamice)[2,2])) 
+#roach
+finalaroach <- glm(currentasthma12 ~ environ1 + as.factor(weightall) + 
+                     as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                     female + as.factor(agegroup5) + as.factor(emp3), data = df3, family = binomial())
+summary(finalaroach)
+exp(coef(finalaroach)[2])
+exp(coef(finalaroach)[2] + c(-1, 1)*1.96*sqrt(vcov(finalaroach)[2,2])) 
+#mold
+finalamold <- glm(currentasthma12 ~ anymold + as.factor(weightall) + 
+                    as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                    female + as.factor(agegroup5) + as.factor(emp3), data = df3, family = binomial())
+summary(finalamold)
+exp(coef(finalamold)[2])
+exp(coef(finalamold)[2] + c(-1, 1)*1.96*sqrt(vcov(finalamold)[2,2])) 
+#shs
+finalashs <- glm(currentasthma12 ~ shshome12 + as.factor(weightall) + 
+                   as.factor(smokecat) + as.factor(education) + as.factor(newrace) +
+                   female + as.factor(agegroup5) + as.factor(emp3), data = df3, family = binomial())
+summary(finalashs)
+exp(coef(finalashs)[2])
+exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
 
 ##secondary analysis
 
