@@ -490,5 +490,8 @@ summary(finalashs)
 exp(coef(finalashs)[2])
 exp(coef(finalashs)[2] + c(-1, 1)*1.96*sqrt(vcov(finalashs)[2,2])) 
 
-###sensitivity analysis
+#demographic characteristics for secondary analysis
+table1(~ factor(female) + factor(agegroup5) + factor(education) + factor(newrace) + 
+         factor(smokecat) + factor(weightall) + factor(emp3) | currentasthma12, data = df2)
+
 
